@@ -45,7 +45,7 @@ namespace JelloTicket.DataLayer.Models
                     NormalizedUserName = "ADMIN@JELLO.COM",
                     EmailConfirmed = true,
                 };
-
+                
                 var password3 = new PasswordHasher<ApplicationUser>();
                 var hashed3 = password3.HashPassword(seedAdminUser, "P@ssW0rd");
                 seedAdminUser.PasswordHash = hashed3;

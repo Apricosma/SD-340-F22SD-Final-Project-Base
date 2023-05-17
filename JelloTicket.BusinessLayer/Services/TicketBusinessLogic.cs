@@ -63,18 +63,7 @@ namespace JelloTicket.BusinessLayer.Services
                 }
                 else
                 {
-                    //List<ApplicationUser> results = _users.Users.Where(u => u != ticket.Owner).ToList();
-
-                    //List<TicketEditVM> currUsers = new List<TicketEditVM>();
-
-                    //results.ForEach(r =>
-                    //{
-                    //TicketEditVM vm = new TicketEditVM();
-                    //    vm.UserName= r.UserName;
-                    //    vm.Editedid = r.Id;
-                    //    currUsers.Add(vm);
-                    //});
-
+                
 
                     // Only return the Ticket for the HTTP GET method
                     return ticket;
@@ -83,12 +72,23 @@ namespace JelloTicket.BusinessLayer.Services
             }
         }
 
-        // Here is where the POST method would go, which is where the data from the
-        // forum submission is taken and submitted to db
-        public void EditTicket(Ticket ticket)
+        public IEnumerable<SelectListItem> users(Ticket ticket)
         {
+            IEnumerable<SelectListItem> currUsers = (IEnumerable<SelectListItem>)_users.Users.Where(u => u != ticket.Owner);
+            return currUsers;
+        }
+        // forum submission is taken and submitted to db
+        public TicketEditVM EditTicket(TicketEditVM ticketVM,int id, string userId)
+        {
+            if (id != ticketVM.ticket.Id)
+            {
+                throw new Exception("Not Found");
+            }
+            ApplicationUser currUser = _users.Users.FirstOrDefault(u => u.Id == userId);
+            ticketVM.ticket.Owner = currUser;
             // business logic for editing the ticket here
-            //_ticketRepo.Update(ticket);
+            _ticketRepo.Update(ticketVM.ticket);
+            return ticketVM;
         }
 
 

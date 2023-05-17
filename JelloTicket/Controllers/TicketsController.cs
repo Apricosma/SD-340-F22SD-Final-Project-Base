@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using JelloTicket.DataLayer.Repositories;
 using Microsoft.AspNetCore.Identity;
+using JelloTicket.BusinessLayer.ViewModels;
 
 namespace SD_340_W22SD_Final_Project_Group6.Controllers
 {
@@ -100,20 +101,36 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
         [Authorize(Roles = "ProjectManager")]
         public async Task<IActionResult> Edit(int? id)
         {
-
-            return View(ticketBusinessLogic.GetTicketById(id));
+            Ticket ticket = ticketBusinessLogic.GetTicketById(id);
+            TicketEditVM vm = new TicketEditVM();
+            vm.ticket = ticket;
+            IEnumerable<SelectListItem> users = ticketBusinessLogic.users(ticket);
+            vm.Users = users;
+            return View(vm);
 
         }
 
+      
+
+        // POST: Tickets/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, string userId, [Bind("Id,Title,Body,RequiredHours")] Ticket ticket)
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ProjectManager")]
+        public async Task<IActionResult> Edit(int id, string userId, [Bind("Id,Title,Body,RequiredHours,userId")] TicketEditVM ticketVM)
         {
-            // this is the post method
-            // refer to the original code to see what exactly you need to pass
-            //ticketBusinessLogic.EditTicket(ticket);
 
-            return View(ticket);
+          
+            if (ModelState.IsValid)
+            {
+                ticketBusinessLogic.EditTicket(ticketVM, id, userId);
+           
+                return RedirectToAction(nameof(Edit), new { id = ticketVM.ticket.Id });
+            }
+            return View(ticketVM);
         }
+
 
         #region NOt need now
         /*
@@ -133,44 +150,7 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
                 return RedirectToAction("Edit", new { id = ticketId });
             }
 
-            // POST: Tickets/Edit/5
-            // To protect from overposting attacks, enable the specific properties you want to bind to.
-            // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            [Authorize(Roles = "ProjectManager")]
-            public async Task<IActionResult> Edit(int id,string userId, [Bind("Id,Title,Body,RequiredHours")] Ticket ticket)
-            {
-                if (id != ticket.Id)
-                {
-                    return NotFound();
-                }
-
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        ApplicationUser currUser = _context.Users.FirstOrDefault(u => u.Id == userId);
-                        ticket.Owner = currUser;
-                        _context.Update(ticket);
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!TicketExists(ticket.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                    return RedirectToAction(nameof(Edit), new {id = ticket.Id});
-                }
-                return View(ticket);
-            }
-
+          
             [HttpPost]
             public async Task<IActionResult> CommentTask(int TaskId, string? TaskText)
             {

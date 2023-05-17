@@ -1,4 +1,5 @@
-﻿@model JelloTicket.DataLayer.Models.Ticket
+﻿@model JelloTicket.BusinessLayer.ViewModels.TicketEditVM
+
 
 @{
     ViewData["Title"] = "Edit";
@@ -13,41 +14,41 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ticket.Id" />
             <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <label asp-for="ticket.Title" class="control-label"></label>
+                <input asp-for="ticket.Title" class="form-control" />
+                <span asp-validation-for="ticket.Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Body" class="control-label"></label>
-                <input asp-for="Body" class="form-control" />
-                <span asp-validation-for="Body" class="text-danger"></span>
+                <label asp-for="ticket.Body" class="control-label"></label>
+                <input asp-for="ticket.Body" class="form-control" />
+                <span asp-validation-for="ticket.Body" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="RequiredHours" class="control-label"></label>
-                <input asp-for="RequiredHours" class="form-control" />
-                <span asp-validation-for="RequiredHours" class="text-danger"></span>
+                <label asp-for="ticket.RequiredHours" class="control-label"></label>
+                <input asp-for="ticket.RequiredHours" class="form-control" />
+                <span asp-validation-for="ticket.RequiredHours" class="text-danger"></span>
             </div>
             <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Owner)
+                            @Html.DisplayNameFor(model => model.ticket.Owner)
             </th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>@Model.Owner</td>
+                        <td>@Model.ticket.Owner</td>
         </tr>
     </tbody>
 </table>
                 <div class="form-group">
-                    <input type="hidden" value=@Model.Id name="ticketId" />
-                    <label asp-for="Owner" class="control-label">Select Users:</label>
-                    <select name="userId" asp-for="Owner" asp-items=@ViewBag.Users></select>
-                    <span asp-validation-for="Owner" class="text-danger"></span>
+                <input type="hidden" value=@Model.ticket.Id name="ticketId" />
+                <label asp-for="ticket.Owner" class="control-label">Select Users:</label>
+                <select name="userId" asp-for="ticket.Owner" asp-items=@Model.Users></select>
+                <span asp-validation-for="ticket.Owner" class="text-danger"></span>
                 </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
