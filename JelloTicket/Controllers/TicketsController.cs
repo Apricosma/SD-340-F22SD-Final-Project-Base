@@ -101,10 +101,19 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
 
-            return View(ticketBusinessLogic.TicketEdit(id));
+            return View(ticketBusinessLogic.GetTicketById(id));
 
         }
-        
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, string userId, [Bind("Id,Title,Body,RequiredHours")] Ticket ticket)
+        {
+            // this is the post method
+            // refer to the original code to see what exactly you need to pass
+            //ticketBusinessLogic.EditTicket(ticket);
+
+            return View(ticket);
+        }
 
         #region NOt need now
         /*

@@ -48,7 +48,7 @@ namespace JelloTicket.BusinessLayer.Services
 
         }
 
-        public Ticket TicketEdit(int? id)
+        public Ticket GetTicketById(int? id)
         {
             if (id == null)
             {
@@ -57,29 +57,39 @@ namespace JelloTicket.BusinessLayer.Services
             else
             {
                 Ticket ticket = _ticketRepo.Get(id);
-                if(ticket == null)
+                if (ticket == null)
                 {
                     throw new Exception("ticket with given id is not found");
-                }else
+                }
+                else
                 {
-                    List<ApplicationUser> results = _users.Users.Where(u => u != ticket.Owner).ToList();
+                    //List<ApplicationUser> results = _users.Users.Where(u => u != ticket.Owner).ToList();
 
-                    List<TicketEditVM> currUsers = new List<TicketEditVM>();
+                    //List<TicketEditVM> currUsers = new List<TicketEditVM>();
 
-                    results.ForEach(r =>
-                    {
-                    TicketEditVM vm = new TicketEditVM();
-                        vm.UserName= r.UserName;
-                        vm.Editedid = r.Id;
-                        currUsers.Add(vm);
-                    });
+                    //results.ForEach(r =>
+                    //{
+                    //TicketEditVM vm = new TicketEditVM();
+                    //    vm.UserName= r.UserName;
+                    //    vm.Editedid = r.Id;
+                    //    currUsers.Add(vm);
+                    //});
 
+
+                    // Only return the Ticket for the HTTP GET method
                     return ticket;
 
                 }
             }
         }
 
+        // Here is where the POST method would go, which is where the data from the
+        // forum submission is taken and submitted to db
+        public void EditTicket(Ticket ticket)
+        {
+            // business logic for editing the ticket here
+            //_ticketRepo.Update(ticket);
+        }
 
 
     }
