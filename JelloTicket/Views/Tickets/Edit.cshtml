@@ -12,13 +12,13 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ticket.Id" />
+            <input type="hidden" asp-for="@Model.ticket.Id" />
             <div class="form-group">
-                <label asp-for="ticket.Title" class="control-label"></label>
-                <input asp-for="ticket.Title" class="form-control" />
-                <span asp-validation-for="ticket.Title" class="text-danger"></span>
+                <label asp-for="@Model.ticket.Title" class="control-label"></label>
+                <input asp-for="@Model.ticket.Title" class="form-control" />
+                <span asp-validation-for="@Model.ticket.Title" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ticket.Body" class="control-label"></label>

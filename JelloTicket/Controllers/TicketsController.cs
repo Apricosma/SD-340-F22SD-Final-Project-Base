@@ -118,17 +118,14 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "ProjectManager")]
-        public async Task<IActionResult> Edit(int id, string userId, [Bind("Id,Title,Body,RequiredHours,userId")] TicketEditVM ticketVM)
+        public async Task<IActionResult> Edit(int id, string userId, [Bind("ticketVM")] TicketEditVM ticketVM)
         {
 
           
-            if (ModelState.IsValid)
-            {
                 ticketBusinessLogic.EditTicket(ticketVM, id, userId);
            
                 return RedirectToAction(nameof(Edit), new { id = ticketVM.ticket.Id });
-            }
-            return View(ticketVM);
+      
         }
 
 
