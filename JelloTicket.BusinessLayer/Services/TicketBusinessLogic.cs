@@ -17,11 +17,12 @@ namespace JelloTicket.BusinessLayer.Services
     public class TicketBusinessLogic
     {
 
-        private readonly TicketRepo _ticketRepo;
-        private readonly ProjectRepo _projectRepo;
-        private readonly UserManager<ApplicationUser> _users; 
+        private readonly IRepository<Ticket> _ticketRepo;
+        private readonly IRepository<Project> _projectRepo;
+        private readonly UserManager<ApplicationUser> _users;
+        private IRepository<Ticket> ticketRepo;
 
-        public TicketBusinessLogic(TicketRepo ticketRepo, ProjectRepo projectRepo, UserManager<ApplicationUser> users)
+        public TicketBusinessLogic(IRepository<Ticket> ticketRepo, IRepository<Project> projectRepo, UserManager<ApplicationUser> users)
         {
             _ticketRepo = ticketRepo;
             _projectRepo = projectRepo;
@@ -47,7 +48,7 @@ namespace JelloTicket.BusinessLayer.Services
 
         }
 
-        public ICollection<TicketEditVM> TicketEdit(int? id)
+        public Ticket TicketEdit(int? id)
         {
             if (id == null)
             {
@@ -73,7 +74,7 @@ namespace JelloTicket.BusinessLayer.Services
                         currUsers.Add(vm);
                     });
 
-                    return currUsers;
+                    return ticket;
 
                 }
             }

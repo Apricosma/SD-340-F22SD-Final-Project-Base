@@ -20,7 +20,7 @@ namespace JelloTicket.DataLayer.Repositories
 
         public Ticket Get(int? id) 
         {
-            return (Ticket)_context.Tickets.Where(t => t.Id == id);
+            return (Ticket)_context.Tickets.FirstOrDefault(t => t.Id == id);
         }
 
         public ICollection<Ticket> GetAll()
