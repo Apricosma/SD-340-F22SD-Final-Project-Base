@@ -12,7 +12,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 using X.PagedList.Mvc;
-
+using JelloTicket.DataLayer.Data;
+using JelloTicket.DataLayer.Models;
 
 namespace SD_340_W22SD_Final_Project_Group6.Controllers
 {

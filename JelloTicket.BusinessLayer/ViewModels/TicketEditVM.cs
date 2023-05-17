@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace JelloTicket.BusinessLayer.ViewModels
 {
-    internal class TicketEditVM
+    public class TicketEditVM
     {
+
+        public string Editedid { get; set; }
+        public string UserName { get; set; }
+        
+
+
+
     }
 }

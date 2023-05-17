@@ -1,6 +1,10 @@
 ﻿using JelloTicket.BusinessLayer.ViewModels;
 using JelloTicket.DataLayer.Models;
 using JelloTicket.DataLayer.Repositories;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,10 +19,13 @@ namespace JelloTicket.BusinessLayer.Services
 
         private readonly TicketRepo _ticketRepo;
         private readonly ProjectRepo _projectRepo;
-        public TicketBusinessLogic(TicketRepo ticketRepo, ProjectRepo projectRepo)
+        private readonly UserManager<ApplicationUser> _users; 
+
+        public TicketBusinessLogic(TicketRepo ticketRepo, ProjectRepo projectRepo, UserManager<ApplicationUser> users)
         {
             _ticketRepo = ticketRepo;
             _projectRepo = projectRepo;
+            _users = users;
         }
 
 
@@ -40,42 +47,39 @@ namespace JelloTicket.BusinessLayer.Services
 
         }
 
-        public TicketVM Details(int? id)
+        public ICollection<TicketEditVM> TicketEdit(int? id)
         {
             if (id == null)
             {
-                throw new NullReferenceException(" Ticket id is null in Details");
+                throw new NullReferenceException("Id is NUll");
             }
             else
             {
-
                 Ticket ticket = _ticketRepo.Get(id);
-                Project project = ticket.Project;
-                
-
-                if (ticket == null)
+                if(ticket == null)
                 {
-                    throw new NullReferenceException("Cannot Find Ticket with the given id ");
-                }
-                else
+                    throw new Exception("ticket with given id is not found");
+                }else
                 {
-             
-                    TicketVM vm = new TicketVM();
-                    vm.Tickets.Add(ticket);
-                    vm.Project = project;
-                    vm.TicketWatcher = ticket.TicketWatchers.ToList();
+                    List<ApplicationUser> results = _users.Users.Where(u => u != ticket.Owner).ToList();
 
-                    TicketWatcher ticketWatcher = ticket.TicketWatchers.FirstOrDefault(tw => tw.Ticket.Id == id);
-                    vm.Watcher = ticketWatcher.Watcher;
-                    vm.Owner = ticket.Owner;
-                    vm.Comment = ticket.Comments.ToList();
-                    Comment comment = ticket.Comments.FirstOrDefault(c => c.Ticket.Id == id);
-                    vm.CreatedBy = comment.CreatedBy;
-                    return vm;
+                    List<TicketEditVM> currUsers = new List<TicketEditVM>();
+
+                    results.ForEach(r =>
+                    {
+                    TicketEditVM vm = new TicketEditVM();
+                        vm.UserName= r.UserName;
+                        vm.Editedid = r.Id;
+                        currUsers.Add(vm);
+                    });
+
+                    return currUsers;
 
                 }
             }
         }
+
+
 
     }
 

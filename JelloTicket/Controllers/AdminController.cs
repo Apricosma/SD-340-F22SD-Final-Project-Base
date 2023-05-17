@@ -29,9 +29,9 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
 
 
 
-            vm.pms = (ICollection<Models.ApplicationUser>)pmUsers;
-            vm.devs = (ICollection<Models.ApplicationUser>)devUsers;
-            vm.allUsers = (ICollection<Models.ApplicationUser>)allUsers;
+            //vm.pms = (ICollection<Models.ApplicationUser>)pmUsers;
+            //vm.devs = (ICollection<Models.ApplicationUser>)devUsers;
+            //vm.allUsers = (ICollection<Models.ApplicationUser>)allUsers;
             return View(vm);
         }
 

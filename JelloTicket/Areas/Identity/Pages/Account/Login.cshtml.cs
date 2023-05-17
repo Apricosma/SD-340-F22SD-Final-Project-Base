@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using SD_340_W22SD_Final_Project_Group6.Models;
+using JelloTicket.DataLayer.Models;
 
 namespace SD_340_W22SD_Final_Project_Group6.Areas.Identity.Pages.Account
 {
