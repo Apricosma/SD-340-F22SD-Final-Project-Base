@@ -15,6 +15,7 @@ namespace JelloTicket.BusinessLayer.ViewModels
     public class TicketEditVM
     {
        public Ticket ticket { get; set; }
+        public int id { get; set; }
         public IEnumerable<SelectListItem> Users { get; set; } = new HashSet<SelectListItem>();
 
 

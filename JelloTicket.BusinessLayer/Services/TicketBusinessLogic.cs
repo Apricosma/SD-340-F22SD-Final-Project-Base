@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -48,6 +49,14 @@ namespace JelloTicket.BusinessLayer.Services
 
         }
 
+        public TicketEditVM EditGet(Ticket ticket)
+        {
+            TicketEditVM vm = new TicketEditVM();
+            vm.ticket = ticket;
+            IEnumerable<SelectListItem> remainingUsers = users(ticket);
+            vm.Users = remainingUsers;
+            return vm;
+        }
         public Ticket GetTicketById(int? id)
         {
             if (id == null)
