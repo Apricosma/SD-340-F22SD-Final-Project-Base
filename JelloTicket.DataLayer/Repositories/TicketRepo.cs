@@ -1,5 +1,6 @@
 ﻿using JelloTicket.DataLayer.Data;
 using JelloTicket.DataLayer.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +18,14 @@ namespace JelloTicket.DataLayer.Repositories
             _context = context;
         }
 
-        public Ticket Get(int? id)
+        public Ticket Get(int? id) 
         {
             return (Ticket)_context.Tickets.Where(t => t.Id == id);
         }
 
         public ICollection<Ticket> GetAll()
         {
-            return _context.Tickets.ToHashSet();
+            return _context.Tickets.Include(t => t.Project).Include(t => t.Owner).ToHashSet();
         }
 
         public void Create(Ticket ticket)
@@ -44,5 +45,6 @@ namespace JelloTicket.DataLayer.Repositories
             _context.Tickets.Remove(_context.Tickets.First(t => t.Id == id));
             _context.SaveChanges();
         }
+
     }
 }

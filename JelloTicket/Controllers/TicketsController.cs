@@ -1,34 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SD_340_W22SD_Final_Project_Group6.Data;
-using SD_340_W22SD_Final_Project_Group6.Models;
-using JelloTicket.DataLayer.Repositories;
+﻿using JelloTicket.BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using SD_340_W22SD_Final_Project_Group6.Models.ViewModel;
 
 namespace SD_340_W22SD_Final_Project_Group6.Controllers
 {
     [Authorize]
     public class TicketsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly TicketBusinessLogic ticketBusinessLogic;
 
-        public TicketsController(ApplicationDbContext context)
+        public TicketsController(TicketBusinessLogic _ticketBusinessLogic)
         {
-            _context = context;
+            ticketBusinessLogic = _ticketBusinessLogic;
         }
 
         // GET: Tickets
-        public async Task<IActionResult> Index()
+        public  ICollection<Ticket> Index()
         {
-              return _context.Tickets != null ? 
-                          View(await _context.Tickets.Include(t => t.Project).Include(t => t.Owner).ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Tickets'  is null.");
+            return ticketBusinessLogic.GetTickets().ToList();
         }
 
         // GET: Tickets/Details/5
