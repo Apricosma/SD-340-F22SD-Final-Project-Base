@@ -1,5 +1,6 @@
 ﻿using JelloTicket.BusinessLayer.Services;
 using JelloTicket.DataLayer.Models;
+using JelloTicket.DataLayer.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
