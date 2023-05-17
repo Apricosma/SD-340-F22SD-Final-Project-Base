@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using JelloTicket.DataLayer.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace SD_340_W22SD_Final_Project_Group6.Controllers
 {
@@ -12,10 +14,12 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
     public class TicketsController : Controller
     {
         private readonly TicketBusinessLogic ticketBusinessLogic;
+        private readonly ProjectBusinessLogic projectBusinessLogic;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public TicketsController(TicketBusinessLogic _ticketBusinessLogic)
+        public TicketsController(IRepository<Ticket> ticketRepo, IRepository<Project> projectRepo, UserManager<ApplicationUser> userManager)
         {
-            ticketBusinessLogic = _ticketBusinessLogic;
+            ticketBusinessLogic = new TicketBusinessLogic(ticketRepo, projectRepo, userManager);
         }
 
         // GET: Tickets
@@ -92,15 +96,24 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
             }
         */
 
-            // GET: Tickets/Edit/5
-            [Authorize(Roles = "ProjectManager")]
-            public async Task<IActionResult> Edit(int? id)
-            {
+        // GET: Tickets/Edit/5
+        [Authorize(Roles = "ProjectManager")]
+        public async Task<IActionResult> Edit(int? id)
+        {
 
-            return View(ticketBusinessLogic.TicketEdit(id));
+            return View(ticketBusinessLogic.GetTicketById(id));
 
-            }
-        
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, string userId, [Bind("Id,Title,Body,RequiredHours")] Ticket ticket)
+        {
+            // this is the post method
+            // refer to the original code to see what exactly you need to pass
+            //ticketBusinessLogic.EditTicket(ticket);
+
+            return View(ticket);
+        }
 
         #region NOt need now
         /*
