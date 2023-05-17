@@ -118,7 +118,7 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "ProjectManager")]
-        public async Task<IActionResult> Edit(int id, string userId, [Bind("Id,Title,Body,RequiredHours,userId")] TicketEditVM ticketVM)
+        public async Task<IActionResult> Edit(int id, string userId, [Bind("Id,Title,Body,RequiredHours,Ticket,userId")] TicketEditVM ticketVM)
         {
 
           
