@@ -74,7 +74,7 @@ namespace JelloTicket.BusinessLayer.Services
 
         public IEnumerable<SelectListItem> users(Ticket ticket)
         {
-            IEnumerable<SelectListItem> currUsers = (IEnumerable<SelectListItem>)_users.Users.Where(u => u != ticket.Owner);
+            IEnumerable<SelectListItem> currUsers = _users.Users.Where(u => u != ticket.Owner);
             return currUsers;
         }
         // forum submission is taken and submitted to db
