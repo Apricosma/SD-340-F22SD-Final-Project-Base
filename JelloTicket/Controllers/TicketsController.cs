@@ -24,9 +24,9 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
         }
 
         // GET: Tickets
-        public  ICollection<Ticket> Index()
+        public  TicketIndex Index()
         {
-            return ticketBusinessLogic.GetTickets().ToList();
+            return ticketBusinessLogic.GetTickets();
         }
         /*
             // GET: Tickets/Details/5
