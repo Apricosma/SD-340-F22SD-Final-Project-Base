@@ -25,7 +25,7 @@ namespace JelloTicket.DataLayer.Repositories
 
         public ICollection<Ticket> GetAll()
         {
-            return _context.Tickets.Include(t => t.Project).Include(t => t.Owner).ToHashSet();
+            return _context.Tickets.ToList();
         }
 
         public void Create(Ticket ticket)

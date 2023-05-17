@@ -102,10 +102,7 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             Ticket ticket = ticketBusinessLogic.GetTicketById(id);
-            TicketEditVM vm = new TicketEditVM();
-            vm.ticket = ticket;
-            IEnumerable<SelectListItem> users = ticketBusinessLogic.users(ticket);
-            vm.Users = users;
+            TicketEditVM vm = ticketBusinessLogic.EditGet(ticket);
             return View(vm);
 
         }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,17 +33,24 @@ namespace JelloTicket.BusinessLayer.Services
 
 
 
-        public ICollection<Ticket> GetTickets()
+        public TicketIndex GetTickets()
         {
+              
+            List<Ticket> tickets = _ticketRepo.GetAll().ToList();
+            List<Project> projects = _projectRepo.GetAll().ToList();
+            List<ApplicationUser> Owners = _users.Users.ToList();
 
-            List<Ticket> list = _ticketRepo.GetAll().ToList();
-            if (list.Count == 0)
+            if (tickets.Count == 0 || projects.Count ==0|| Owners.Count==0)
             {
                 throw new NullReferenceException("tickets are Empty");
             }
             else
             {
-                return _ticketRepo.GetAll();
+                TicketIndex vm = new TicketIndex();
+                vm.tickets = tickets;
+                vm.projects = projects;
+                vm.Owners = Owners;
+                return vm;
 
             }
 
