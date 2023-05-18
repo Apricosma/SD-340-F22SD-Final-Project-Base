@@ -19,7 +19,7 @@ namespace JelloTicket.DataLayer.Repositories
 
         public Comment Get(int? id)
         {
-            return (Comment)_context.Tickets.Where(t => t.Id == id);
+            return (Comment)_context.Comments.Where(t => t.Id == id);
         }
 
         public ICollection<Comment> GetAll()

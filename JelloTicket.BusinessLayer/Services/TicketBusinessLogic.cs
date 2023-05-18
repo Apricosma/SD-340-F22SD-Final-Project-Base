@@ -1,6 +1,7 @@
 ﻿using JelloTicket.BusinessLayer.ViewModels;
 using JelloTicket.DataLayer.Models;
 using JelloTicket.DataLayer.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace JelloTicket.BusinessLayer.Services
@@ -21,38 +24,112 @@ namespace JelloTicket.BusinessLayer.Services
 
         private readonly IRepository<Ticket> _ticketRepo;
         private readonly IRepository<Project> _projectRepo;
+        private readonly IRepository<Comment> _commentRepo;
         private readonly UserManager<ApplicationUser> _users;
+        private readonly IRepository<UserProject> _userProjectRepo;
+
         private IRepository<Ticket> ticketRepo;
 
-        public TicketBusinessLogic(IRepository<Ticket> ticketRepo, IRepository<Project> projectRepo, UserManager<ApplicationUser> users)
+        public TicketBusinessLogic(IRepository<Ticket> ticketRepo, IRepository<Project> projectRepo, UserManager<ApplicationUser> users, IRepository<Comment> commentRepo, IRepository<UserProject> userProjectRepo)
         {
             _ticketRepo = ticketRepo;
             _projectRepo = projectRepo;
             _users = users;
+            _commentRepo = commentRepo;
+            _userProjectRepo = userProjectRepo;
         }
 
-
-
-        public TicketIndex GetTickets()
+        public TicketCreateVM CreateGet(int projId)
         {
-              
+            if (projId == null) 
+            {
+                throw new Exception("Id is invalid");
+            } 
+            else { 
+                Project currentProject = _projectRepo.Get(projId);
+            
+            if (currentProject == null)
+                {
+                    throw new Exception("Cannot find project with the given id ");
+                }
+                else
+                {
+                    TicketCreateVM vm = new TicketCreateVM();
+                    UserProject userProject = _userProjectRepo.Get(projId);
+
+                    ICollection<UserProject> projects = _userProjectRepo.GetAll();
+
+					List<string> projectUserIds = projects.Select(p => p.UserId).ToList();
+
+					List<ApplicationUser> users = _users.Users.Where(u => projectUserIds.Contains(u.Id)).ToList();
+
+					currentProject.AssignedTo = projects;
+
+                    int index = 0;
+                    foreach (UserProject project in projects)
+                    {
+                        if (project.ProjectId == projId)
+                        {
+                            project.ApplicationUser = users[index];
+                            index++;
+                            if (index >= users.Count)
+                            {
+                                index = 0;
+                            }
+                        }
+                    }
+
+                    List<SelectListItem> currUsers = new List<SelectListItem>();
+                    currentProject.AssignedTo.ToList().ForEach(t =>
+                    {
+                        currUsers.Add(new SelectListItem(t.ApplicationUser.UserName, t.ApplicationUser.Id.ToString()));
+                    });
+
+                    vm.project = currentProject;
+                    vm.currUsers = currUsers;
+                    return vm;
+
+                }
+            }
+       
+        }
+
+        public Ticket CreatePost(int projId, string userId,Ticket ticket)
+        {
+			Project currProj =   _projectRepo.Get(projId);
+            ticket.Project = currProj;
+			ApplicationUser owner = _users.Users.FirstOrDefault(u => u.Id == userId);
+			ticket.Owner = owner;
+            _ticketRepo.Create(ticket);
+			currProj.Tickets.Add(ticket);
+            return ticket;
+
+		}
+		public IResult GetTickets()
+        {
+
             List<Ticket> tickets = _ticketRepo.GetAll().ToList();
-            List<Project> projects = _projectRepo.GetAll().ToList();
-            List<ApplicationUser> Owners = _users.Users.ToList();
 
-            if (tickets.Count == 0 || projects.Count ==0|| Owners.Count==0)
+            foreach (Ticket ticket in tickets)
             {
-                throw new NullReferenceException("tickets are Empty");
-            }
-            else
-            {
-                TicketIndex vm = new TicketIndex();
-                vm.tickets = tickets;
-                vm.projects = projects;
-                vm.Owners = Owners;
-                return vm;
+                int projId = ticket.ProjectId;
+                Project project = _projectRepo.GetAll().FirstOrDefault(p => p.Id == projId);
+                ticket.Project = project;
+                List<Comment> comments = _commentRepo.GetAll().Where(c => c.TicketId == ticket.Id).ToList();
 
+                ticket.Comments = comments;
             }
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                MaxDepth = 0
+            };
+
+
+            string jsonResult = JsonSerializer.Serialize(tickets, options);
+            Object jsonObject = JsonSerializer.Deserialize<object>(jsonResult);
+
+            return Results.Ok(jsonObject);
 
 
         }
@@ -80,7 +157,7 @@ namespace JelloTicket.BusinessLayer.Services
                 }
                 else
                 {
-                
+
 
                     // Only return the Ticket for the HTTP GET method
                     return ticket;
@@ -100,7 +177,7 @@ namespace JelloTicket.BusinessLayer.Services
             }); return currUsers;
         }
         // forum submission is taken and submitted to db
-        public TicketEditVM EditTicket(TicketEditVM ticketVM,int id, string userId)
+        public TicketEditVM EditTicket(TicketEditVM ticketVM, int id, string userId)
         {
             if (id != ticketVM.ticket.Id)
             {
