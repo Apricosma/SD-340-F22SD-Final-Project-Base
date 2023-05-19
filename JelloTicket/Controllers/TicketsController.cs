@@ -11,29 +11,29 @@ using JelloTicket.BusinessLayer.ViewModels;
 
 namespace SD_340_W22SD_Final_Project_Group6.Controllers
 {
-	[Authorize]
-	public class TicketsController : Controller
-	{
-		private readonly TicketBusinessLogic ticketBusinessLogic;
-		private readonly ProjectBusinessLogic projectBusinessLogic;
-		private readonly UserManager<ApplicationUser> userManager;
-		private readonly IRepository<Comment> _commentRepository;
-		private readonly IRepository<UserProject> _userprojectRepo;
-		private readonly IRepository<TicketWatcher> _ticketWatcher;
+    [Authorize]
+    public class TicketsController : Controller
+    {
+        private readonly TicketBusinessLogic ticketBusinessLogic;
+        private readonly ProjectBusinessLogic projectBusinessLogic;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly IRepository<Comment> _commentRepository;
+        private readonly IRepository<UserProject> _userprojectRepo;
+        private readonly IRepository<TicketWatcher> _ticketWatcher;
 
-		public TicketsController(IRepository<Ticket> ticketRepo, IRepository<Project> projectRepo, UserManager<ApplicationUser> userManager, IRepository<Comment> commentRepository, IRepository<UserProject> userprojectRepo, IRepository<TicketWatcher> ticketWatcher)
-		{
-			ticketBusinessLogic = new TicketBusinessLogic(ticketRepo, projectRepo, userManager, commentRepository, userprojectRepo, ticketWatcher);
-			_commentRepository = commentRepository;
+        public TicketsController(IRepository<Ticket> ticketRepo, IRepository<Project> projectRepo, UserManager<ApplicationUser> userManager, IRepository<Comment> commentRepository, IRepository<UserProject> userprojectRepo, IRepository<TicketWatcher> ticketWatcher)
+        {
+            ticketBusinessLogic = new TicketBusinessLogic(ticketRepo, projectRepo, userManager, commentRepository, userprojectRepo, ticketWatcher);
+            _commentRepository = commentRepository;
             _ticketWatcher = ticketWatcher;
-		}
+        }
 
-		// GET: Tickets
-		public IResult Index()
-		{
-			return ticketBusinessLogic.GetTickets();
-		}
-		/*
+        // GET: Tickets
+        public IResult Index()
+        {
+            return ticketBusinessLogic.GetTickets();
+        }
+        /*
             // GET: Tickets/Details/5
             public async Task<IActionResult> Details(int? id)
             {
@@ -59,64 +59,64 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
                 return View(ticket);
             }
         */
-		// GET: Tickets/Create
-		[Authorize(Roles = "ProjectManager")]
-		public IActionResult Create(int projId)
-		{
+        // GET: Tickets/Create
+        [Authorize(Roles = "ProjectManager")]
+        public IActionResult Create(int projId)
+        {
 
-			TicketCreateVM vm = ticketBusinessLogic.CreateGet(projId);
-			return View(vm);
+            TicketCreateVM vm = ticketBusinessLogic.CreateGet(projId);
+            return View(vm);
 
-		}
-
-
-		// POST: Tickets/Create
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		[Authorize(Roles = "ProjectManager")]
-		public async Task<IActionResult> Create([Bind("Id,Title,Body,RequiredHours,TicketPriority")] Ticket ticket, int projId, string userId)
-		{
-			if (ModelState.IsValid)
-			{
-
-				ticketBusinessLogic.CreatePost(projId, userId, ticket);
-				return RedirectToAction("Index", "Projects", new { area = "" });
-			}
-			return View(ticket);
-		}
+        }
 
 
-		// GET: Tickets/Edit/5
-		[Authorize(Roles = "ProjectManager")]
-		public async Task<IActionResult> Edit(int? id)
-		{
-			Ticket ticket = ticketBusinessLogic.GetTicketById(id);
-			TicketEditVM vm = ticketBusinessLogic.EditGet(ticket);
-			return View(vm);
+        // POST: Tickets/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ProjectManager")]
+        public async Task<IActionResult> Create([Bind("Id,Title,Body,RequiredHours,TicketPriority")] Ticket ticket, int projId, string userId)
+        {
+            if (ModelState.IsValid)
+            {
 
-		}
-
-
-
-		// POST: Tickets/Edit/5
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		[Authorize(Roles = "ProjectManager")]
-		public async Task<IActionResult> Edit(int id, string userId, TicketEditVM ticketVM)
-		{
-			ticketBusinessLogic.EditTicket(ticketVM, id, userId);
-
-			return RedirectToAction(nameof(Edit), new { id = ticketVM.ticket.Id });
-
-		}
+                ticketBusinessLogic.CreatePost(projId, userId, ticket);
+                return RedirectToAction("Index", "Projects", new { area = "" });
+            }
+            return View(ticket);
+        }
 
 
-		#region NOt need now
-		/*
+        // GET: Tickets/Edit/5
+        [Authorize(Roles = "ProjectManager")]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            Ticket ticket = ticketBusinessLogic.GetTicketById(id);
+            TicketEditVM vm = ticketBusinessLogic.EditGet(ticket);
+            return View(vm);
+
+        }
+
+
+
+        // POST: Tickets/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ProjectManager")]
+        public async Task<IActionResult> Edit(int id, string userId, TicketEditVM ticketVM)
+        {
+            ticketBusinessLogic.EditTicket(ticketVM, id, userId);
+
+            return RedirectToAction(nameof(Edit), new { id = ticketVM.ticket.Id });
+
+        }
+
+
+        #region NOt need now
+        /*
         [Authorize(Roles = "ProjectManager")]
             public async Task<IActionResult> RemoveAssignedUser(string id, int ticketId)
             {
@@ -186,42 +186,23 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
                 return RedirectToAction("Index");
             }
         */
-		public async Task<IActionResult> AddToWatchers(int id)
-		{
+        public async Task<IActionResult> AddToWatchers(int id)
+        {
 
-			string userName = User.Identity.Name;
-			ticketBusinessLogic.AddtoWatchers(userName, id);
-			return RedirectToAction("Details", new { id });
+            string userName = User.Identity.Name;
+            ticketBusinessLogic.AddtoWatchers(userName, id);
+            return RedirectToAction("Details", new { id });
 
-		}
-		/*
-            public async Task<IActionResult> UnWatch(int id)
-            {
-                if (id != null)
-                {
-                    try
-                    {
+        }
 
-                        string userName = User.Identity.Name;
-                        ApplicationUser user = _context.Users.First(u => u.UserName == userName);
-                        Ticket ticket = _context.Tickets.FirstOrDefault(t => t.Id == id);
-                        TicketWatcher currTickWatch = await _context.TicketWatchers.FirstAsync(tw => tw.Ticket.Equals(ticket) && tw.Watcher.Equals(user));
-                        _context.TicketWatchers.Remove(currTickWatch);
-                        ticket.TicketWatchers.Remove(currTickWatch);
-                        user.TicketWatching.Remove(currTickWatch);
+        public async Task<IActionResult> UnWatch(int id)
+        {
+            string userName = User.Identity.Name;
+            ticketBusinessLogic.UnWatch(userName, id);
+            return RedirectToAction("Details", new { id });
 
-                        await _context.SaveChangesAsync();
-                        return RedirectToAction("Details", new { id });
-
-                    }
-                    catch (Exception ex)
-                    {
-                        return RedirectToAction("Error", "Home");
-                    }
-                }
-                return RedirectToAction("Index");
-            }
-
+        }
+        /*
             public async Task<IActionResult> MarkAsCompleted(int id)
             {
                 if (id != null)
@@ -311,7 +292,7 @@ namespace SD_340_W22SD_Final_Project_Group6.Controllers
               return (_context.Tickets?.Any(e => e.Id == id)).GetValueOrDefault();
             }
         */
-		#endregion
-	}
+        #endregion
+    }
 }
 

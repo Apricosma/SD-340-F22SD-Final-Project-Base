@@ -119,9 +119,8 @@ namespace JelloTicket.BusinessLayer.Services
 				throw new Exception("UserName is empty:");
 			}
 			ApplicationUser user = _users.Users.First(u => u.UserName == userName);
-			Ticket ticket = _ticketRepo.Get(id);
-
-			newTickWatch.Ticket = ticket;
+            Ticket ticket = _ticketRepo.Get(id);
+            newTickWatch.Ticket = ticket;
 			newTickWatch.Watcher = user;
 			user.TicketWatching.Add(newTickWatch);
 			ticket.TicketWatchers.Add(newTickWatch);
@@ -129,7 +128,19 @@ namespace JelloTicket.BusinessLayer.Services
 
 
 		}
-		public IResult GetTickets()
+		public void UnWatch(string userName,int id) 
+		{
+            ApplicationUser user = _users.Users.First(u => u.UserName == userName);
+            Ticket ticket = _ticketRepo.Get(id);
+			List<TicketWatcher> ticketWatchers = _ticketWatcher.GetAll().ToList();
+            TicketWatcher currTickWatch =ticketWatchers.First(tw => tw.Ticket.Equals(ticket) && tw.Watcher.Equals(user));
+
+            _ticketRepo.Delete(currTickWatch.Id);
+            ticket.TicketWatchers.Remove(currTickWatch);
+            user.TicketWatching.Remove(currTickWatch);
+
+        }
+        public IResult GetTickets()
 		{
 
 			List<Ticket> tickets = _ticketRepo.GetAll().ToList();
