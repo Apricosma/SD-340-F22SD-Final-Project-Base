@@ -1,4 +1,5 @@
 ﻿using JelloTicket.BusinessLayer.Services;
+using JelloTicket.BusinessLayer.ViewModels;
 using JelloTicket.DataLayer.Data;
 using JelloTicket.DataLayer.Models;
 using JelloTicket.DataLayer.Repositories;
@@ -23,6 +24,8 @@ namespace UnitTests
         public IQueryable<Ticket> data { get; set; }
         public IQueryable<ApplicationUser> users { get; set; }
         public IQueryable<TicketWatcher> ticketWatchers { get; set; }
+        public IQueryable<Project> projects { get; set; }
+        public IQueryable<UserProject> userProjects { get; set; }
 
         private Mock<IRepository<Ticket>> _ticketRepositoryMock;
 
@@ -43,7 +46,7 @@ namespace UnitTests
         // https://stackoverflow.com/questions/49165810/how-to-mock-usermanager-in-net-core-testing
         //public static Mock<UserManager<TUser>> MockUserManager<TUser>(List<TUser> ls) where TUser : class
         //{
-            
+
 
         //    return mgr;
         //}
@@ -52,7 +55,7 @@ namespace UnitTests
         public void Initialize()
         {
 
-       
+
             List<ApplicationUser> CreatedUsers = new List<ApplicationUser>
             {
             new ApplicationUser {UserName = "Jim",Email = "Jim@test.com" },
@@ -116,6 +119,42 @@ namespace UnitTests
 
             mockContext.Setup(t => t.TicketWatchers).Returns(mockTicketWatchers.Object);
 
+
+
+            List<Project> createProjects = new List<Project>
+            {new Project {Id =1, ProjectName = "Project one ", CreatedBy = users.First(), },
+
+            };
+            projects = createProjects.AsQueryable();
+
+
+            Mock<DbSet<Project>> mockProjects = new Mock<DbSet<Project>>();
+            mockProjects.As<IQueryable<Project>>().Setup(m => m.Provider).Returns(projects.Provider);
+            mockProjects.As<IQueryable<Project>>().Setup(m => m.ElementType).Returns(projects.ElementType);
+            mockProjects.As<IQueryable<Project>>().Setup(m => m.Expression).Returns(projects.Expression);
+            mockProjects.As<IQueryable<Project>>().Setup(m => m.GetEnumerator()).Returns(() => projects.GetEnumerator());
+
+            mockContext.Setup(t => t.Projects).Returns(mockProjects.Object);
+
+
+
+            List<UserProject> createdUserProjects = new List<UserProject>
+            {new UserProject {Id =1, ApplicationUser = users.First(),Project = projects.First(),UserId = users.First().Id }
+            };
+            userProjects = createdUserProjects.AsQueryable();
+
+
+            Mock<DbSet<UserProject>> mockuserProjects = new Mock<DbSet<UserProject>>();
+            mockuserProjects.As<IQueryable<UserProject>>().Setup(m => m.Provider).Returns(userProjects.Provider);
+            mockuserProjects.As<IQueryable<UserProject>>().Setup(m => m.ElementType).Returns(userProjects.ElementType);
+            mockuserProjects.As<IQueryable<UserProject>>().Setup(m => m.Expression).Returns(userProjects.Expression);
+            mockuserProjects.As<IQueryable<UserProject>>().Setup(m => m.GetEnumerator()).Returns(() => userProjects.GetEnumerator());
+
+            mockContext.Setup(t => t.UserProjects).Returns(mockuserProjects.Object);
+
+
+
+
             Mock<IRepository<Ticket>> ticketRepositoryMock = new Mock<IRepository<Ticket>>();
             _ticketRepositoryMock = ticketRepositoryMock;
 
@@ -137,7 +176,7 @@ namespace UnitTests
                      mgr.Object,
                     new UserManagerBusinessLogic(mgr.Object),
                     new UserProjectRepo(mockContext.Object),
-                       new TicketWatcherRepo(mockContext.Object), new UserRepo(mockContext.Object,mgr.Object)
+                       new TicketWatcherRepo(mockContext.Object), new UserRepo(mockContext.Object, mgr.Object)
             );
 
             //ticketRepositoryMock.Setup(tr => tr.Get(It.IsAny<int>()))
@@ -181,13 +220,13 @@ namespace UnitTests
 
         }
 
-              [TestMethod]
+        [TestMethod]
         [DataRow(5)]
         public void GetUsersWithoutTicket_Problem(int id)
         {
             Ticket checkingTicket = data.FirstOrDefault(t => t.Id == id);
 
-  
+
             Assert.ThrowsException<NullReferenceException>(() => ticketBL.users(checkingTicket));
 
 
@@ -198,7 +237,7 @@ namespace UnitTests
         public void DoesTicketExist_Solution(int id)
         {
 
-            bool exisitngticket = ticketBL.DoesTicketExist(id); 
+            bool exisitngticket = ticketBL.DoesTicketExist(id);
 
             Assert.IsTrue(exisitngticket);
 
@@ -219,7 +258,7 @@ namespace UnitTests
 
             ticketBL.AddtoWatchers(user1.UserName, checkingTicket.Id);
 
-            Assert.AreEqual(checkingTicket.TicketWatchers.First(),user1.TicketWatching.First()); 
+            Assert.AreEqual(checkingTicket.TicketWatchers.First(), user1.TicketWatching.First());
         }
 
         [TestMethod]
@@ -248,6 +287,60 @@ namespace UnitTests
 
             Assert.ThrowsException<NullReferenceException>(() => ticketBL.UnWatch(null, checkingTicket.Id));
         }
+        [TestMethod]
+        public void CreatePost_Solution()
+        {
+            Project project = projects.First();
+            ApplicationUser user = users.First();
+            Ticket ticket = data.Last();
+            ticketBL.CreatePost(project.Id, user.Id, ticket);
+            Assert.AreEqual(user, ticket.Owner);
+
+
+
+        }
+        [TestMethod]
+
+        public void CreateGet_Solution()
+        {
+            Project project = projects.First();
+          TicketCreateVM result =   ticketBL.CreateGet(project.Id);
+            Assert.AreEqual(project, result.project);
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        [DataRow(null)]
+        public void CreateGet_Problem(int ? id)
+        {
+          
+            Assert.ThrowsException<NullReferenceException>(() => ticketBL.CreateGet(id) );
+
+        }
+
+    
+        [TestMethod]
+        [DataRow(null)] 
+        public void RemoveUser_Problem(string? id)
+        {
+            Ticket ticket = data.First();
+            Assert.ThrowsException<ArgumentException>(() => ticketBL.RemoveUser(id, ticket.Id));
+        }
+
+            [TestMethod]
+        public void RemoveUser_Solution()
+        {
+            Ticket ticket = data.First();
+            ApplicationUser user = users.First();
+
+            ticketBL.RemoveUser(user.Id, ticket.Id);
+
+            Assert.IsNull(ticket.Owner);
+
+        }
+        
+    
+    
     }
 
 }

@@ -38,7 +38,7 @@ namespace JelloTicket.BusinessLayer.Services
             , UserManager<ApplicationUser> userManager
             , UserManagerBusinessLogic userManagerBusinessLogic
             , IRepository<UserProject> userProjectRepo
-            , IRepository<TicketWatcher> ticketWatcher,IRepository<ApplicationUser> UserRepo)
+            , IRepository<TicketWatcher> ticketWatcher, IRepository<ApplicationUser> UserRepo)
         {
             _ticketRepository = ticketRepository;
             _projectRepository = projectRepository;
@@ -92,11 +92,14 @@ namespace JelloTicket.BusinessLayer.Services
 
             Ticket currentTicket = _ticketRepository.Get(ticketId);
 
-            ApplicationUser applicationUser = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+            List<ApplicationUser> Users = _userRepo.GetAll().ToList();
+            ApplicationUser applicationUser = Users.FirstOrDefault(u => u.Id == userId);
 
-            if (currentTicket != null)
+            if (currentTicket != null && applicationUser != null)
             {
-                currentTicket.Owner = applicationUser;
+                Users.Remove(applicationUser);
+
+                currentTicket.Owner = null;
             }
         }
 
@@ -113,7 +116,7 @@ namespace JelloTicket.BusinessLayer.Services
 
         public bool DoesTicketExist(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 throw new NullReferenceException("Id is NUll");
             }
@@ -121,11 +124,11 @@ namespace JelloTicket.BusinessLayer.Services
             return _ticketRepository.Exists(id);
         }
 
-        public TicketCreateVM CreateGet(int projId)
+        public TicketCreateVM CreateGet(int? projId)
         {
             if (projId == null)
             {
-                throw new Exception("Id is invalid");
+                throw new NullReferenceException("Id is invalid");
             }
             else
             {
@@ -144,7 +147,9 @@ namespace JelloTicket.BusinessLayer.Services
 
                     List<string> projectUserIds = projects.Select(p => p.UserId).ToList();
 
-                    List<ApplicationUser> users = _userManager.Users.Where(u => projectUserIds.Contains(u.Id)).ToList();
+                    List<ApplicationUser> Users = _userRepo.GetAll().ToList();
+
+                    List<ApplicationUser> users = Users.Where(u => projectUserIds.Contains(u.Id)).ToList();
 
                     currentProject.AssignedTo = projects;
 
@@ -179,9 +184,19 @@ namespace JelloTicket.BusinessLayer.Services
 
         public Ticket CreatePost(int projId, string userId, Ticket ticket)
         {
+
+            if (projId == null || userId == null|| ticket == null)
+            {
+                throw new NullReferenceException("arguments cannot be null");
+            }
+
             Project currProj = _projectRepository.Get(projId);
             ticket.Project = currProj;
-            ApplicationUser owner = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+
+
+            List<ApplicationUser> Users = _userRepo.GetAll().ToList();
+
+            ApplicationUser owner = Users.FirstOrDefault(u => u.Id == userId);
             ticket.Owner = owner;
             _ticketRepository.Create(ticket);
             currProj.Tickets.Add(ticket);
@@ -294,5 +309,8 @@ namespace JelloTicket.BusinessLayer.Services
             user.TicketWatching.Remove(currTickWatch);
 
         }
+
+
+
     }
 }
