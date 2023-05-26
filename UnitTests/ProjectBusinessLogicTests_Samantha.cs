@@ -88,7 +88,7 @@ namespace UnitTests
             _projectRepositoryMock = projectRepositoryMock;
 
             var userManagerBusinessLogic = new Mock<UserManagerBusinessLogic>();
-            userProjectRepository = new Mock<UserProjectRepo>();
+            var userProjectRepository = new Mock<IRepository<UserProject>>();
             var ticketRepository = new Mock<IRepository<Ticket>>();
             var userProjectRepo = new Mock<IUserProjectRepo>();
 
@@ -119,6 +119,9 @@ namespace UnitTests
 
             userProjectRepository.Setup(pr => pr.GetAll())
                 .Returns(new List<UserProject>());
+
+            userProjectRepo.Setup(r => r.GetUserProjectByProjectIdAndUSerId(It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync((int projectId, string userId) => new UserProject { ProjectId = projectId, UserId = userId });
 
         }
 
@@ -267,14 +270,21 @@ namespace UnitTests
                 userProject,
             };
 
-            var userProjectRepo = new Mock<UserProjectRepo>();
-            
-            userProjectRepo.Setup(pr => pr.GetAll())
-                .Returns(userProjects);
+            // Act
+            bool result = projectBL.RemoveAssignedUser(user.Id, project.Id).Result;
+            // I can't figure out how to call the user project from the repo due
+            // to how my userproject system is set up
 
-            // Act/Assert
+            Assert.IsTrue(result);
+        }
 
-            Assert.IsTrue(projectBL.RemoveAssignedUser(user.Id, project.Id).Result);
+        [TestMethod]
+        public void RemoveAssignedUser_WithNull_ThrowsException()
+        {
+            Project project = new Project { Id = 555 };
+
+            // Act & Assert
+            Assert.ThrowsExceptionAsync<ArgumentNullException>(() => projectBL.RemoveAssignedUser(null, project.Id));
         }
 
         [TestMethod]

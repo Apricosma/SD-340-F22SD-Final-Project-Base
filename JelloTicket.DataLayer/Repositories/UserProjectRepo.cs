@@ -57,7 +57,7 @@ namespace JelloTicket.DataLayer.Repositories
             return _context.UserProjects.Any(up => up.Id == id);
         }
 
-        public async Task<UserProject> GetUserProjectByProjectIdAndUSerId(int projectId, string userId)
+        public virtual async Task<UserProject> GetUserProjectByProjectIdAndUSerId(int projectId, string userId)
         {
             return _context.UserProjects.FirstOrDefault(up => up.ProjectId == projectId && up.UserId == userId);
         }
