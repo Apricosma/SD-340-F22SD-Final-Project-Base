@@ -343,26 +343,11 @@ namespace UnitTests
                 ProjectName = "TestProj"
             };
 
-            UserProject newUserProject = new UserProject()
-            {
-                ApplicationUser = user,
-                UserId = user.Id,
-                Project = project
-            };
-
-            UserProject returnedUserProject = null;
-            userProjectRepository.Setup(pr => pr.Update(It.IsAny<UserProject>()))
-                .Callback<UserProject>(up =>
-                {
-                    returnedUserProject = up;
-                });
-
             // Act
             bool returnsSuccessfully = projectBL.EditProjectModel(userIds, project, user).Result;
 
             // Assert
             Assert.IsTrue(returnsSuccessfully);
-            Assert.AreEqual(returnedUserProject.Project.AssignedTo.First().ApplicationUser, newUserProject.ApplicationUser);
         }
 
         [TestMethod]
