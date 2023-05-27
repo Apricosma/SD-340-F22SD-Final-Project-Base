@@ -125,11 +125,11 @@ namespace JelloTicket.BusinessLayer.Services
             return _ticketRepository.Exists(id);
         }
 
-        public TicketCreateVM CreateGet(int projId)
+        public TicketCreateVM CreateGet(int? projId)
         {
             if (projId == null)
             {
-                throw new Exception("Id is invalid");
+                throw new NullReferenceException("Id is invalid");
             }
             else
             {
@@ -183,12 +183,14 @@ namespace JelloTicket.BusinessLayer.Services
         
         public Ticket CreatePost(int projId, string userId, Ticket ticket)
         {
-            if(userId == null)
+            if (projId == null || userId == null || ticket == null)
             {
-                throw new ArgumentNullException("userId");
+                throw new ArgumentNullException("arguments cannot be null");
             }
+
             Project currProj = _projectRepository.Get(projId);
             ticket.Project = currProj;
+
             ApplicationUser owner = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             ticket.Owner = owner;
             _ticketRepository.Create(ticket);
